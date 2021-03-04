@@ -36,6 +36,7 @@ def get_paths_already_finished_from_cache(cache_path):
     for path,result in stream_results(cache_path,flatten=False,progress=False):
         if result:
             if type(path)==list: path=tuple(path)
+            if type(path)==dict: path=tuple(sorted(list(path.items())))
             yield path
 
 def now(now=None):
@@ -129,7 +130,8 @@ def slingshot(path_sling=None,stone_name=None,stone_args=None,paths=None,llp_cor
             pass
 
     # Get paths!
-    if not all_paths: all_paths = load_paths(path_source,path_ext,limit,shuffle_paths,path_key,path_prefix,path_suffix) if not paths else paths
+    if not all_paths:
+        all_paths = load_paths(path_source,path_ext,limit,shuffle_paths,path_key,path_prefix,path_suffix) if not paths else paths
 
     # Break if these weren't returned
     if not all_paths: return
@@ -151,7 +153,7 @@ def slingshot(path_sling=None,stone_name=None,stone_args=None,paths=None,llp_cor
                 pass
         if resume:
             paths_done = set(list(get_paths_already_finished_from_cache(cache_path)))
-            #print('\n>> [Slingshot] already finished %s of %s' % (len(paths_done),len(all_paths)))
+            print('\n>> [Slingshot] already finished %s of %s' % (len(paths_done),len(all_paths)))
             try:
                 all_paths=list(set(all_paths)-paths_done)
             except TypeError:
@@ -160,14 +162,15 @@ def slingshot(path_sling=None,stone_name=None,stone_args=None,paths=None,llp_cor
         import random
         if shuffle_paths: random.shuffle(all_paths)
 
+    ## de-tuple?
+    all_paths = [
+        dict(p) if (p and type(p)==tuple and set(len(x) for x in p)=={2}) else p
+        for p in all_paths
+    ]
 
     ## RUNS?
     # Multiply paths by runs
     all_paths = [(path,run+1) for path in all_paths for run in range(num_runs)]
-
-
-
-
 
     t1 = dt.now()
     if parallel < 2:
@@ -468,6 +471,7 @@ def load_paths(path_source,path_ext,limit,shuffle_paths,path_key=PATH_KEY,path_p
     if shuffle_paths:
         random.shuffle(paths)
     paths=[tuple(x) if type(x)==list else x for x in paths]
+    paths=[tuple(sorted(list(x.items()))) if x==dict else x for x in paths]
     return paths
 
 
