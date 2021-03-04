@@ -49,7 +49,7 @@ def now(now=None):
 
 data_slingshot='.data_slingshot/'
 
-def prepare_slingshot(func, objects, path_src=None, savedir=None, overwrite=False, **kwargs):
+def shoot(func, objects, path_src=None, savedir=None, overwrite=False, **kwargs):
     # init savedir
     funcname = func if type(func)==str else func.__name__
     if type(func)==str and (not path_src or not os.path.exists(path_src)):
@@ -88,8 +88,6 @@ def prepare_slingshot(func, objects, path_src=None, savedir=None, overwrite=Fals
 def gather(savedir):
     return list(stream_results(os.path.join(savedir,'cache')))
 
-# convenience
-shoot=prepare_slingshot
 
 
 def slingshot(path_sling=None,stone_name=None,stone_args=None,paths=None,llp_corpus=None,limit=None,path_source=None,stone=None,path_key=PATH_KEY,path_ext=None,path_prefix='',path_suffix='',cache_results=True,cache_path=None,save_results=True,results_dir=None,shuffle_paths=True,do_stream_results=True,save_txt=True,txt_maxcols=TXT_MAXCOLS,sling_args=[],sling_kwargs={},num_runs=1,oneshot=False,llp_pass_text=False,llp_method='',progress_bar=True,savecsv='',resume=False,overwrite=False,parallel=1,llp_pass_path='path'):
